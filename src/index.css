@@ -10,7 +10,9 @@ ul,
 ol {
   list-style-type: none;
 }
-
+body {
+  font-family: var(--primary-font);
+}
 :root {
   --title-color: #11175d;
   --black: #000;
@@ -19,12 +21,11 @@ ol {
   --secondary-color: #03014c;
   --red-orange: #ea6c00;
   --error: #f55050;
-  --primary-font: "Poppins", sans-serif;
-  --secondary-font: "Nunito", sans-serif;
-  --rare-font: "Open Sans", sans-serif;
+  --primary-font: "Source Sans Pro", sans-serif;
+  --secondary-font: "Poppins", sans-serif;
 }
 /* box design */
-.box {
+.form_center {
   align-items: center !important;
   height: 100vh;
 }
