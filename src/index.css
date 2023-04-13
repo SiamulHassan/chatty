@@ -1,0 +1,41 @@
+/* basic styling  */
+* {
+  margin: 0;
+  padding: 0;
+}
+a {
+  text-decoration: none;
+}
+ul,
+ol {
+  list-style-type: none;
+}
+
+:root {
+  --title-color: #11175d;
+  --black: #000;
+  --white: #fff;
+  --primary-color: #5f35f5;
+  --secondary-color: #03014c;
+  --red-orange: #ea6c00;
+  --error: #f55050;
+  --primary-font: "Poppins", sans-serif;
+  --secondary-font: "Nunito", sans-serif;
+  --rare-font: "Open Sans", sans-serif;
+}
+/* box design */
+.box {
+  align-items: center !important;
+  height: 100vh;
+}
+
+.inputs-design {
+  width: 70% !important;
+  margin-bottom: 15px !important;
+}
+
+.form-error {
+  margin-bottom: 15px;
+  color: var(--error);
+  font-family: var(--secondary-font);
+}
