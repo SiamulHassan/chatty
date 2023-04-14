@@ -56,37 +56,52 @@ const Registration = () => {
         auth,
         formik.values.email,
         formik.values.password
-      ).then(({ user }) => {
-        // update display name
-        updateProfile(auth.currentUser, {
-          displayName: formik.values.fullName,
-        }).then(() => {
-          setIsLoading(false);
-          sendEmailVerification(auth.currentUser)
-            .then(() => {
-              set(ref(db, "users/" + user.uid), {
-                username: user.displayName,
-                email: user.email,
+      )
+        .then(({ user }) => {
+          // update display name
+          updateProfile(auth.currentUser, {
+            displayName: formik.values.fullName,
+          }).then(() => {
+            setIsLoading(false);
+            sendEmailVerification(auth.currentUser)
+              .then(() => {
+                set(ref(db, "users/" + user.uid), {
+                  username: user.displayName,
+                  email: user.email,
+                });
+              })
+              .then(() => {
+                toast.success("😴 check you mail and verify!", {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: false,
+                  progress: undefined,
+                  theme: "colored",
+                });
+                setIsLoading(false);
+                formik.resetForm();
+                setTimeout(() => {
+                  navigate("/login");
+                }, 1500);
               });
-            })
-            .then(() => {
-              toast.success("😴 check you mail and verify!", {
-                position: "top-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: false,
-                progress: undefined,
-                theme: "colored",
-              });
-              setIsLoading(false);
-              formik.resetForm();
-              setTimeout(() => {
-                navigate("/login");
-              }, 1500);
+          });
+        })
+        .then((error) => {
+          if (error.code.includes("auth/email-already-in-use")) {
+            toast.error("👿 email already is in use !", {
+              position: "bottom-center",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: false,
+              progress: undefined,
+              theme: "light",
             });
+            setIsLoading(false);
+          }
         });
-      });
     },
   });
   //auth/email-already-in-use
@@ -308,7 +323,7 @@ const Registration = () => {
                 </form>
                 <div className="links">
                   <p>
-                    Already have an account ? <Link to="/login">Sign In</Link>{" "}
+                    Already have an account ? <Link to="/login">Sign In</Link>
                   </p>
                 </div>
               </div>
