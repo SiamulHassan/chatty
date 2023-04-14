@@ -89,7 +89,7 @@ const Registration = () => {
           });
         })
         .then((error) => {
-          if (error.code.includes("auth/email-already-in-use")) {
+          if (error.message.includes("auth/email-already-in-use")) {
             toast.error("👿 email already is in use !", {
               position: "bottom-center",
               autoClose: 2000,

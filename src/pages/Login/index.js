@@ -25,13 +25,19 @@ import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+// firebase database
+import { getDatabase, ref, set } from "firebase/database";
 // facebook login
 import { FacebookAuthProvider } from "firebase/auth";
+// login slice action and dispatch
+import { useDispatch } from "react-redux";
+import { loginReducer } from "../../Slice/loginSlice";
 
 const Login = () => {
   const [showEye, setShowEye] = useState("password");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const db = getDatabase();
   const auth = getAuth();
   const handleEye = () => {
     showEye === "password" ? setShowEye("text") : setShowEye("password");
@@ -41,6 +47,8 @@ const Login = () => {
     email: "",
     password: "",
   };
+  // dispatch
+  const dispatch = useDispatch();
   const formik = useFormik({
     initialValues,
     // validationSchema: signIn,
@@ -54,7 +62,9 @@ const Login = () => {
         .then(({ user }) => {
           if (user.emailVerified) {
             // dispatch user info
+            dispatch(loginReducer(user));
             // set user info to local storage
+            localStorage.setItem("chattyUsers", JSON.stringify(user));
             // navigate
             navigate("/");
           } else {
@@ -101,17 +111,38 @@ const Login = () => {
     },
   });
   // handle google login
-  const provider = new GoogleAuthProvider();
+  const googleProvider = new GoogleAuthProvider();
   const handleGoogle = () => {
-    signInWithPopup(auth, provider).then(({ user }) => {
+    signInWithPopup(auth, googleProvider).then(({ user }) => {
       // dispatch
+      dispatch(loginReducer(user));
       // local storage
+      localStorage.setItem("chattyUsers", JSON.stringify(user));
       //set to firebase data base
+      set(ref(db, "users/" + user.uid), {
+        username: user.displayName,
+        email: user.email,
+      });
       //nevigate
+      navigate("/");
     });
   };
   // handle facebook login
-  const handleFacebook = () => {};
+  const fbProvider = new FacebookAuthProvider();
+  const handleFacebook = () => {
+    signInWithPopup(auth, fbProvider).then(({ user }) => {
+      // dispatch fb login
+      dispatch(loginReducer(user));
+      // set local storage
+      localStorage.setItem("chattyUsers", JSON.stringify(user));
+      // set fb logged in data to firebase
+      set(ref(db, "users/" + user.uid), {
+        username: user.displayName,
+        email: user.email,
+      });
+      navigate("/");
+    });
+  };
   return (
     <>
       <Container fixed>
