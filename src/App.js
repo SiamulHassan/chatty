@@ -1,4 +1,5 @@
 // importing pages
+import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 // react router
 import {
@@ -12,6 +13,7 @@ function App() {
     createRoutesFromElements(
       <Route>
         <Route path="/registration" element={<Registration />} />
+        <Route path="/login" element={<Login />} />
         {/* <Route element={<LoggedInUser />}>
           <Route element={<MenuBar />}>
             <Route path="/" element={<Home />}></Route>

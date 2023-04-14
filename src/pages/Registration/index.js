@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 // importing css
 import "./style.css";
+//importing css toastify
+import "react-toastify/dist/ReactToastify.css";
 // mui imports
 import { Button, Container, Grid, TextField } from "@mui/material";
 //formik imports
@@ -8,18 +10,28 @@ import { useFormik } from "formik";
 //react spinners
 import { PulseLoader } from "react-spinners";
 //react router dom
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 //importing icons
 import { TfiEye } from "react-icons/tfi";
 import { FaRegEyeSlash } from "react-icons/fa";
 // validation
 import { signUp } from "../../Validation";
 // authentication
-
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+} from "firebase/auth";
 //database
+import { getDatabase, ref, set } from "firebase/database";
+import { ToastContainer, toast } from "react-toastify";
 const Registration = () => {
   // firebase database and authentication
-
+  const auth = getAuth();
+  const db = getDatabase();
+  //navigate>useNavigate
+  const navigate = useNavigate();
   // showing eye on password field
   const [showEye, setShowEye] = useState("password");
   // handle eye
@@ -38,13 +50,50 @@ const Registration = () => {
   const formik = useFormik({
     initialValues,
     validationSchema: signUp,
-    onSubmit() {},
+    onSubmit() {
+      setIsLoading(true);
+      createUserWithEmailAndPassword(
+        auth,
+        formik.values.email,
+        formik.values.password
+      ).then(({ user }) => {
+        // update display name
+        updateProfile(auth.currentUser, {
+          displayName: formik.values.fullName,
+        }).then(() => {
+          setIsLoading(false);
+          sendEmailVerification(auth.currentUser)
+            .then(() => {
+              set(ref(db, "users/" + user.uid), {
+                username: user.displayName,
+                email: user.email,
+              });
+            })
+            .then(() => {
+              toast.success("😴 check you mail and verify!", {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: false,
+                progress: undefined,
+                theme: "colored",
+              });
+              setIsLoading(false);
+              formik.resetForm();
+              setTimeout(() => {
+                navigate("/login");
+              }, 1500);
+            });
+        });
+      });
+    },
   });
-
+  //auth/email-already-in-use
   return (
     <>
       <Container fixed>
-        {/* <ToastContainer /> */}
+        <ToastContainer />
         <Grid className="form_center" container spacing={6}>
           <Grid item xs={6}>
             <div className="forms">
