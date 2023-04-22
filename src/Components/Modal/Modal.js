@@ -22,6 +22,7 @@ const SidebarModal = ({ open, setOpen }) => {
       >
         <Fade in={open}>
           <Box className="box-modal">
+            {/* jokhon amara profile upload done tokhon setOpen amar false kore dibo. note: amra parent Modal theke child UploadProfile  e state pathcci,,,,child e jokhon value change hobe-> orthat state update hobe , tokhon parent auto sei data ta pabe and state ke update kore dibe*/}
             <UploadProfile setOpen={setOpen} />
           </Box>
         </Fade>

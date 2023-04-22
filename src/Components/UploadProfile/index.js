@@ -8,19 +8,36 @@ import "cropperjs/dist/cropper.css";
 import { IoIosImages } from "react-icons/io";
 import ImageCropper from "../ImageCropper/ImageCropper";
 //firebase storage
-import { getStorage, ref, uploadString } from "firebase/storage";
-// default image
-const defaultSrc = "./images/avatar.png";
-const UploadProfile = () => {
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadString,
+} from "firebase/storage";
+// importing firebase auth
+import { getAuth, updateProfile } from "firebase/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { loginReducer } from "../../Slice/loginSlice";
+const UploadProfile = ({ setOpen }) => {
+  //current user
+  const currentUser = useSelector((users) => users.logIn.login);
+
   const [image, setImage] = useState();
   // we do not need cropdata cause we are directly uploading cropped image to firebase
   // const [cropData, setCropData] = useState("#");
   const cropperRef = createRef();
+  // createRef takes data from <Cropper/> component
   // firebase storage
   const storage = getStorage();
-  const storageRef = ref(storage, "some-child");
+  const storageRef = ref(storage, currentUser.uid);
+  //firebase auth
+  const auth = getAuth();
   // choose file
   const chooseFile = useRef();
+  // dispatch
+  const dispatch = useDispatch();
+  // loading
+  const [loading, setLoading] = useState(false);
   const onChange = (e) => {
     e.preventDefault();
     let files;
@@ -40,13 +57,25 @@ const UploadProfile = () => {
       // setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
       // uploadURL in firebsae was message4 which means:::// message4:::  The first argument to the function is a reference to the location in the storage bucket where the string should be uploaded. The second argument is the string to be uploaded, which is in this case message4.
       // The third argument to uploadString() is the format of the data in the string being uploaded. In this case, the format is specified as data_url. This parameter tells Firebase Storage that the string being uploaded is in the data: URL format.
+      setLoading(true);
       const uploadURL = cropperRef.current?.cropper
         .getCroppedCanvas()
         .toDataURL();
       uploadString(storageRef, uploadURL, "data_url").then((snapshot) => {
-        console.log("Uploaded a data_url string!");
-        console.log("Uploaded! snapVal", snapshot.val());
-        console.log("Uploaded snap", snapshot);
+        //downloading uploaded img url
+        getDownloadURL(storageRef).then((downloadURL) => {
+          updateProfile(auth.currentUser, {
+            photoURL: downloadURL,
+          }).then(() => {
+            setOpen(false);
+            dispatch(loginReducer({ ...currentUser, photoURL: downloadURL }));
+            localStorage.setItem(
+              "chattyUsers",
+              JSON.stringify({ ...currentUser, photoURL: downloadURL })
+            );
+            setLoading(false);
+          });
+        });
       });
     }
   };
@@ -85,6 +114,7 @@ const UploadProfile = () => {
               setImage={setImage}
               cropperRef={cropperRef}
               getCropData={getCropData}
+              loading={loading}
             />
           )}
           <p>Upload Photo</p>

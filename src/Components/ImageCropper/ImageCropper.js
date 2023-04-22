@@ -2,11 +2,19 @@ import React from "react";
 //importing css
 import "./style.css";
 //importing react cropper
-import Cropper, { ReactCropperElement } from "react-cropper";
+import Cropper from "react-cropper";
 // importing close icon
 import { AiOutlineClose } from "react-icons/ai";
 import { Button } from "@mui/material";
-const ImageCropper = ({ image, cropperRef, getCropData, setImage }) => {
+// pulse loader
+import { PulseLoader } from "react-spinners";
+const ImageCropper = ({
+  image,
+  cropperRef,
+  getCropData,
+  setImage,
+  loading,
+}) => {
   const handleBackImg = () => {
     setImage(null);
   };
@@ -40,17 +48,21 @@ const ImageCropper = ({ image, cropperRef, getCropData, setImage }) => {
           autoCropArea={1}
         />
         <div className="upload-btn" onClick={getCropData}>
-          <Button
-            variant="contained"
-            sx={{
-              background: "#5f35f5ea",
-              ":hover": {
-                bgcolor: "#5f35f5cb",
-              },
-            }}
-          >
-            upload now
-          </Button>
+          {loading ? (
+            <PulseLoader color="#5f35f5ea" />
+          ) : (
+            <Button
+              variant="contained"
+              sx={{
+                background: "#5f35f5ea",
+                ":hover": {
+                  bgcolor: "#5f35f5cb",
+                },
+              }}
+            >
+              upload now
+            </Button>
+          )}
         </div>
       </div>
     </>
