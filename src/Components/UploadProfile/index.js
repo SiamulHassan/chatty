@@ -1,8 +1,7 @@
 import React, { createRef, useRef, useState } from "react";
 // importing css
 import "./style.css";
-//importing react cropper
-import Cropper, { ReactCropperElement } from "react-cropper";
+
 // importing cropper css
 import "cropperjs/dist/cropper.css";
 // importing icon
@@ -14,7 +13,8 @@ import { getStorage, ref, uploadString } from "firebase/storage";
 const defaultSrc = "./images/avatar.png";
 const UploadProfile = () => {
   const [image, setImage] = useState();
-  const [cropData, setCropData] = useState("#");
+  // we do not need cropdata cause we are directly uploading cropped image to firebase
+  // const [cropData, setCropData] = useState("#");
   const cropperRef = createRef();
   // firebase storage
   const storage = getStorage();
@@ -37,7 +37,7 @@ const UploadProfile = () => {
   };
   const getCropData = () => {
     if (typeof cropperRef.current?.cropper !== "undefined") {
-      setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
+      // setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
       // uploadURL in firebsae was message4 which means:::// message4:::  The first argument to the function is a reference to the location in the storage bucket where the string should be uploaded. The second argument is the string to be uploaded, which is in this case message4.
       // The third argument to uploadString() is the format of the data in the string being uploaded. In this case, the format is specified as data_url. This parameter tells Firebase Storage that the string being uploaded is in the data: URL format.
       const uploadURL = cropperRef.current?.cropper
@@ -82,7 +82,8 @@ const UploadProfile = () => {
           {image && (
             <ImageCropper
               image={image}
-              cropData={cropData}
+              setImage={setImage}
+              cropperRef={cropperRef}
               getCropData={getCropData}
             />
           )}
