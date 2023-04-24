@@ -5,13 +5,27 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { SlLogout } from "react-icons/sl";
 // css
 import "./style.css";
+//components
 import SidebarIcon from "./sidebarIcon";
 import SidebarModal from "../Modal/Modal";
+// firebase
+import { getAuth, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 const Sidebar = () => {
   // modal
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => {
     setOpen(true);
+  };
+  // navigate
+  const navigate = useNavigate();
+  // firbase auth
+  const auth = getAuth();
+  // sign out
+  const handleSingOut = () => {
+    signOut(auth).then(() => {
+      navigate("/login");
+    });
   };
   return (
     <>
@@ -40,7 +54,7 @@ const Sidebar = () => {
           <SidebarIcon />
         </div>
         <div className="logout">
-          <SlLogout />
+          <SlLogout onClick={handleSingOut} />
         </div>
       </nav>
       <SidebarModal open={open} setOpen={setOpen} />

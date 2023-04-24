@@ -32,6 +32,7 @@ import { FacebookAuthProvider } from "firebase/auth";
 // login slice action and dispatch
 import { useDispatch } from "react-redux";
 import { loginReducer } from "../../Slice/loginSlice";
+import { logIn } from "../../Validation/index";
 
 const Login = () => {
   const [showEye, setShowEye] = useState("password");
@@ -51,7 +52,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const formik = useFormik({
     initialValues,
-    // validationSchema: signIn,
+    validationSchema: logIn,
     onSubmit() {
       setIsLoading(true);
       signInWithEmailAndPassword(

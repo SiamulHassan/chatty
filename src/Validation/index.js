@@ -8,3 +8,10 @@ export const signUp = Yup.object({
     .oneOf([Yup.ref("password"), null], "Did not match")
     .required("You Missed Confirm Password"),
 });
+export const logIn = Yup.object({
+  email: Yup.string().required("you missed email field"),
+  password: Yup.string().required("you missed pass field"),
+});
+export const checkMail = Yup.object({
+  email: Yup.string().required("email required !"),
+});
