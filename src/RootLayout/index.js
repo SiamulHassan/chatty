@@ -13,6 +13,7 @@ const RootLayout = () => {
           <Sidebar />
         </Grid>
         <Grid item xs={11}>
+          {/* out let means ei component(RootLayout) er outlet */}
           <Outlet />
         </Grid>
       </Grid>

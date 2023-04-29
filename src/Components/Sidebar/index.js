@@ -11,9 +11,11 @@ import SidebarModal from "../Modal/Modal";
 // firebase
 import { getAuth, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginReducer } from "../../Slice/loginSlice";
 const Sidebar = () => {
+  // current user
+  const currentUser = useSelector((user) => user.logIn.login);
   //dispatch
   const dispatch = useDispatch();
   // modal
@@ -47,7 +49,12 @@ const Sidebar = () => {
                   }}
                   alt=""
                 /> */}
-              <img src="./images/avatar.png" alt="profile_pic" />
+
+              <img
+                src={currentUser.photoURL || "./images/avatar.png"}
+                onError={(e) => (e.target.src = "./images/avatar.png")}
+                alt="profile_pic"
+              />
             </picture>
             <div className="profile_overlay">
               <AiOutlineCloudUpload />
