@@ -11,7 +11,11 @@ import SidebarModal from "../Modal/Modal";
 // firebase
 import { getAuth, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginReducer } from "../../Slice/loginSlice";
 const Sidebar = () => {
+  //dispatch
+  const dispatch = useDispatch();
   // modal
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => {
@@ -24,6 +28,9 @@ const Sidebar = () => {
   // sign out
   const handleSingOut = () => {
     signOut(auth).then(() => {
+      // local storage theke remove hobe but redux theke remove hobe na
+      localStorage.removeItem("chattyUsers");
+      dispatch(loginReducer(null));
       navigate("/login");
     });
   };
