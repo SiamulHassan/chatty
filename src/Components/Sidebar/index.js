@@ -1,5 +1,5 @@
 // importing useState
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 //icons
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import { SlLogout } from "react-icons/sl";
@@ -10,9 +10,12 @@ import SidebarIcon from "./sidebarIcon";
 import SidebarModal from "../Modal/Modal";
 // firebase
 import { getAuth, signOut } from "firebase/auth";
+//react dom
 import { useNavigate } from "react-router-dom";
+// dispatch action and redux
 import { useDispatch, useSelector } from "react-redux";
 import { loginReducer } from "../../Slice/loginSlice";
+
 const Sidebar = () => {
   // current user
   const currentUser = useSelector((user) => user.logIn.login);
@@ -25,7 +28,6 @@ const Sidebar = () => {
   };
   // navigate
   const navigate = useNavigate();
-  // firbase auth
   const auth = getAuth();
   // sign out
   const handleSingOut = () => {
@@ -36,20 +38,16 @@ const Sidebar = () => {
       navigate("/login");
     });
   };
+  console.log(currentUser);
   return (
     <>
       <nav className="nav">
         <div className="profile_wrapper">
           <div className="profile" onClick={handleModalOpen}>
             <picture>
-              {/* <img
-                  src={user.photoURL || "./images/avatar.png"}
-                  onError={(e) => {
-                    e.target.src = "./images/avatar.png";
-                  }}
-                  alt=""
-                /> */}
-
+              {/* akdom surute profile jokhon kw upload kore nai tokhon photoURL null thake 'currentUser.photoURL' null, so "./images/avatar.png" ata dekhabe But je akbar phot upload korche tar always photURL e url thakbe but seta valid jodi firebase theke delet na koro AR valid na jodi delet koro  */}
+              {/* akhon delet korle error ashbe>> onError lagbe cause firebase theke photo delet kore dile redux e photoURl error pabe ar sei error er jonno onError use kore default pic dea hiose */}
+              {/* tar mane akhane || "./images/avatar.png" ai part use hoise only akdom shuru handle korar jonno */}
               <img
                 src={currentUser.photoURL || "./images/avatar.png"}
                 onError={(e) => (e.target.src = "./images/avatar.png")}
@@ -61,7 +59,7 @@ const Sidebar = () => {
             </div>
           </div>
           <div className="displayName">
-            <p>Siamul Hassan</p>
+            <p>{currentUser.displayName}</p>
           </div>
         </div>
         <div className="menu">
