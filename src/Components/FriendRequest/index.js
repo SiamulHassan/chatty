@@ -41,7 +41,20 @@ const FriendReq = () => {
       setShowFrndReq(frndReqArr);
     });
   }, [db, currentUser.uid]);
-  console.log("showFrndReq:REQ", showFrndReq);
+  //////////////////////////////////////////
+  /// ACCEPT REQUEST
+  const handleAccept = (frndReqData) => {
+    set(push(ref(db, "friends")), {
+      ...frndReqData,
+    }).then(() => {
+      remove(ref(db, "friendRequest/" + frndReqData.frendReqRefKey));
+    });
+  };
+  //////////////////////////////////////////
+  /// REJECT REQUEST
+  const handleReject = (frndReqRefKey) => {
+    remove(ref(db, "friendRequest/" + frndReqRefKey));
+  };
   return (
     <>
       <div className="userlist_box">
@@ -70,6 +83,7 @@ const FriendReq = () => {
                     type="submit"
                     className="group-btn"
                     variant="contained"
+                    onClick={() => handleAccept(frndReq)}
                   >
                     Accept
                   </Button>
@@ -79,6 +93,7 @@ const FriendReq = () => {
                     type="submit"
                     className="btn--reject"
                     variant="contained"
+                    onClick={() => handleReject(frndReq.frendReqRefKey)}
                   >
                     Reject
                   </Button>

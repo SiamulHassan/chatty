@@ -105,7 +105,7 @@ const UserList = () => {
   const handleCancel = (ID) => {
     remove(ref(db, "friendRequest/" + ID));
   };
-  console.log("cancelFriendReq", cancelFriendReq);
+
   return (
     <>
       <div className="userlist_box">
