@@ -3,14 +3,20 @@ import React, { useEffect, useState } from "react";
 import "./style.css";
 import { Button } from "@mui/material";
 // firebase
-import { getDatabase, onValue, ref } from "firebase/database";
+import {
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  remove,
+  set,
+} from "firebase/database";
 //redux
 import { useSelector } from "react-redux";
 const Friends = () => {
   ///////////////////////////////////
   // CURRENT USER
   const currentUser = useSelector((user) => user.logIn.login);
-
   /////////////////////////////////////
   // FIREBASE
   const db = getDatabase();
@@ -41,6 +47,40 @@ const Friends = () => {
       setFriends(friendArr);
     });
   }, [db, currentUser.uid]);
+  ///////////////////////////////////////
+  // HANDLE BLOCK
+  const handleBlock = (friendData) => {
+    if (currentUser.uid === friendData.senderID) {
+      // sender jodi block kore
+      set(push(ref(db, "blockedUsers")), {
+        blockerName: friendData.senderName,
+        blockerID: friendData.senderID,
+        blockerProfile: friendData.senderProfile,
+        whoBlocked: friendData.receiverName,
+        whoBlockedID: friendData.receiverID,
+        whoBlockedProfile: friendData.receiverProfile,
+      }).then(() => {
+        remove(ref(db, "friends/" + friendData.friendRefKey));
+      });
+    } else {
+      // receiver jodi block kore
+      set(push(ref(db, "blockedUsers")), {
+        blockerName: friendData.receiverName,
+        blockerID: friendData.receiverID,
+        blockerProfile: friendData.receiverProfile,
+        whoBlocked: friendData.senderName,
+        whoBlockedID: friendData.senderID,
+        whoBlockedProfile: friendData.senderProfile,
+      }).then(() => {
+        remove(ref(db, "friends/" + friendData.friendRefKey));
+      });
+    }
+  };
+  ///////////////////////////////////////
+  // HANDLE UNFRIEND
+  const handleUnfriend = (friendData) => {
+    remove(ref(db, "friends/" + friendData.friendRefKey));
+  };
   // console.log("friend", friends);
   return (
     <>
@@ -83,6 +123,7 @@ const Friends = () => {
                     type="button"
                     className="group-btn"
                     variant="contained"
+                    onClick={() => handleBlock(friend)}
                   >
                     Block
                   </Button>
@@ -92,6 +133,7 @@ const Friends = () => {
                     type="button"
                     className="btn--unfriend"
                     variant="contained"
+                    onClick={() => handleUnfriend(friend)}
                   >
                     Unfriend
                   </Button>
