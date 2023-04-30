@@ -38,7 +38,7 @@ const Sidebar = () => {
       navigate("/login");
     });
   };
-  console.log(currentUser);
+
   return (
     <>
       <nav className="nav">

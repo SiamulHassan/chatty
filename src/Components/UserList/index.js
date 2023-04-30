@@ -4,7 +4,14 @@ import "./style.css";
 import Search from "../Search";
 import { Button } from "@mui/material";
 // firebase
-import { getDatabase, onValue, ref, set } from "firebase/database";
+import {
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  remove,
+  set,
+} from "firebase/database";
 import {
   getStorage,
   ref as storageRef,
@@ -14,16 +21,15 @@ import { useSelector } from "react-redux";
 const UserList = () => {
   // current user
   const currentUser = useSelector((user) => user.logIn.login);
-  // handle cancle
-  const handleCancel = () => {};
-  // handle request
-  const handleRequest = () => {};
-  // firbase auth
+  // firbase
   const db = getDatabase();
   const storage = getStorage();
+  ////////// STATES
+  const [userList, setUserList] = useState([]);
+  const [friendReq, setFriendReq] = useState([]);
+  const [cancelFriendReq, setCancelFriendReq] = useState([]);
   /////////////////////////////////////////
   /// FETCHING UERS
-  const [userList, setUserList] = useState([]);
   useEffect(() => {
     const fetchUsers = ref(db, "users");
     onValue(fetchUsers, (snapshot) => {
@@ -47,13 +53,59 @@ const UserList = () => {
               });
             })
             .then(() => {
+              // prothom bar akta array te i 2ta obj akshathe ashe ([{..2ta obj..}]) jar jonno map hote pare na. tai protho e i jeno akta arry er moddhe 2ta obj seperated by comma akare ashe tai spread kora hoise.[{sakib},{raihan}]
               setUserList([...userArr]);
             });
         }
       });
     });
   }, [db, currentUser.uid, storage]);
-  // console.log("state", userList);
+  /////////////////////////////////////////////////
+  // HANDLE REQUEST
+  const handleRequest = (userData) => {
+    // usersRefKey holo user create korar somoy je tar jonno unique id create hoy
+    set(push(ref(db, "friendRequest")), {
+      senderID: currentUser.uid,
+      receiverID: userData.usersRefKey,
+      senderName: currentUser.displayName,
+      receiverName: userData.username,
+      senderProfile: currentUser.photoURL,
+      receiverProfile: userData.photoURL,
+    });
+  };
+  /////////////////////////////////////////////////
+  // SHOWING CANCEL BTN
+  useEffect(() => {
+    const fetchFriendRequest = ref(db, "friendRequest");
+    onValue(fetchFriendRequest, (snapshot) => {
+      let friendReqArr = [];
+      snapshot.forEach((friendReqData) => {
+        friendReqArr.push(
+          friendReqData.val().senderID + friendReqData.val().receiverID
+        );
+      });
+      setFriendReq(friendReqArr);
+    });
+  }, [db]);
+  /////////////////////////////////////////////////
+  // CANCEL REQUEST
+  useEffect(() => {
+    const fetchFriendRequest = ref(db, "friendRequest");
+    onValue(fetchFriendRequest, (snapshot) => {
+      let cancelFrndArr = [];
+      snapshot.forEach((friendReqData) => {
+        cancelFrndArr.push({
+          ...friendReqData.val(),
+          friendReqRefKey: friendReqData.key,
+        });
+      });
+      setCancelFriendReq(cancelFrndArr);
+    });
+  }, [db]);
+  const handleCancel = (ID) => {
+    remove(ref(db, "friendRequest/" + ID));
+  };
+  console.log("cancelFriendReq", cancelFriendReq);
   return (
     <>
       <div className="userlist_box">
@@ -76,23 +128,34 @@ const UserList = () => {
                 </div>
               </div>
               <div className="btn_part">
-                {/* <Button
-              type="submit"
-              className="group-btn"
-              variant="contained"
-              onClick={handleCancel}
-            >
-              Cancel Request
-            </Button> */}
-
-                <Button
-                  type="submit"
-                  className="group-btn"
-                  variant="contained"
-                  onClick={() => handleRequest}
-                >
-                  Sent Request
-                </Button>
+                {friendReq.includes(currentUser.uid + usersData.usersRefKey) ||
+                friendReq.includes(usersData.usersRefKey + currentUser.uid) ? (
+                  <Button
+                    type="submit"
+                    className="group-btn"
+                    variant="contained"
+                    onClick={() =>
+                      handleCancel(
+                        cancelFriendReq.find(
+                          (frnd) =>
+                            currentUser.uid === frnd.senderID &&
+                            usersData.usersRefKey === frnd.receiverID
+                        )?.friendReqRefKey
+                      )
+                    }
+                  >
+                    Cancel Request
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="group-btn"
+                    variant="contained"
+                    onClick={() => handleRequest(usersData)}
+                  >
+                    Sent Request
+                  </Button>
+                )}
               </div>
             </div>
           ))}
