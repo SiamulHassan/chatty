@@ -5,7 +5,14 @@ import { Button } from "@mui/material";
 //redux
 import { useSelector } from "react-redux";
 //firebase
-import { getDatabase, onValue, ref } from "firebase/database";
+import {
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  remove,
+  set,
+} from "firebase/database";
 const BlockedUser = () => {
   //////////////////////////////////////////////
   // CURRENT USER
@@ -35,6 +42,7 @@ const BlockedUser = () => {
             // blocker holo -> sender
             //receiver details dekhbe
             blockUserArr.push({
+              blockUserRefKey: blockedUsers.key,
               whoBlockedName: blockedUsers.val().whoBlocked,
               whoBlockedID: blockedUsers.val().whoBlockedID,
               whoBlockedProfile: blockedUsers.val().whoBlockedProfile,
@@ -42,6 +50,7 @@ const BlockedUser = () => {
           } else {
             //sender info dekhbe::blocker holo -> sender
             blockUserArr.push({
+              blockUserRefKey: blockedUsers.key,
               blockerName: blockedUsers.val().blockerName,
               blockerID: blockedUsers.val().blockerID,
               blockerProfile: blockedUsers.val().blockerProfile,
@@ -52,7 +61,22 @@ const BlockedUser = () => {
       setBlockedUsers(blockUserArr);
     });
   }, [db, currentUser.uid]);
-  //blockedUsers
+  ////////////////////////////////////////////////////
+  /// HANDLE UNBLOCK
+  const handleUnblock = (blockedUserData) => {
+    console.log("nb", blockedUserData);
+    set(push(ref(db, "friends")), {
+      // 'unblock' e click korle console korle only receiver info pabo. kono sender info pabo na...tar mane sender info hobe current user
+      senderName: currentUser.displayName,
+      senderID: currentUser.uid,
+      senderProfile: currentUser.photoURL,
+      receiverID: blockedUserData.whoBlockedID,
+      receiverName: blockedUserData.whoBlockedName,
+      receiverProfile: blockedUserData.whoBlockedProfile,
+    }).then(() => {
+      remove(ref(db, "blockedUsers/" + blockedUserData.blockUserRefKey));
+    });
+  };
   return (
     <>
       <div className="blockUser_box">
@@ -84,6 +108,7 @@ const BlockedUser = () => {
                     type="submit"
                     className="group-btn"
                     variant="contained"
+                    onClick={() => handleUnblock(blockedUser)}
                   >
                     Unblock
                   </Button>
