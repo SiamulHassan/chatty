@@ -2,11 +2,10 @@
   width: 100%;
   box-sizing: border-box;
   box-shadow: 0 3px 10px rgba(10, 10, 10, 0.377);
-  margin-top: 25px;
   padding: 12px;
   border-radius: 8px;
   font-family: var(--primary-font);
-  height: 35vh;
+  height: 44vh;
   overflow-y: auto;
   margin-bottom: 25px;
 }
@@ -40,25 +39,29 @@
 .list_container:not(:last-child) {
   border-bottom: 1px solid rgba(72, 0, 155, 0.219);
 }
-.profile_part {
+.grouplist-profile_part {
   width: 60%;
   display: flex;
   margin-bottom: 10px;
 }
-.profile {
+.grouplist-profile {
   width: 65px;
   height: 65px;
   border-radius: 50%;
   overflow: hidden;
 }
+.grouplist-profile img {
+  width: 65px;
+  height: 65px;
+  object-fit: cover;
+}
 .profile_name {
-  margin-left: 14px;
+  margin-left: 18px;
   font-size: 20px;
   color: var(--secondary-color);
 }
-.profile img {
-  width: 65px;
-  object-fit: cover;
+.admin_name {
+  margin-top: 4px;
 }
 .btn_part {
   width: 40%;

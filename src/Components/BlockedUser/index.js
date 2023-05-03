@@ -64,7 +64,7 @@ const BlockedUser = () => {
   ////////////////////////////////////////////////////
   /// HANDLE UNBLOCK
   const handleUnblock = (blockedUserData) => {
-    console.log("nb", blockedUserData);
+    // console.log("nb", blockedUserData);
     set(push(ref(db, "friends")), {
       // 'unblock' e click korle console korle only receiver info pabo. kono sender info pabo na...tar mane sender info hobe current user
       senderName: currentUser.displayName,
